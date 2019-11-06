@@ -1,3 +1,14 @@
 extends layout
 block content
-  h1 Hello World
+  style
+    include ../public/board.css
+  h1(style="text-align:center") Tic-Tac-Toe VanillaJS
+  div#board
+    table(cellSpacing="0" cellPadding="0" align="center")
+      tbody
+      - for (var i=0; i < 5; i++)
+        tr
+        - for (var j=0; j < 5; j++)
+          td x
+  div.flex-aligner
+    button Reset
