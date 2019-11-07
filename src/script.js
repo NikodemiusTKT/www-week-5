@@ -1,61 +1,82 @@
 
-'use strict'
+// Two dimensional 5 by 5 array structure for holding the tic-tac-toe games
 
-
-// Two dimensional array structure for holding the tic-tac-toe games
-
-var board = [['','',''], ['','',''], ['','','']];
-var rowInd;
+var gameField;
 
 // Constants for holding player numbers and marks to be drawn
-const player1 = 1;
-const player2 = 2;
-const mark1 = "x";
-const mark2 = "o";
+const player1 = "x";
+const player2 = "o";
+
 
 // Winner and turn on global constant
-var winner;
-var turn;
+var playerInfo; //current player
+var boardInfo; // current game situation (win or no win yet)
 
-// Hold columns on global constant
-const cols = document.querySelectorAll('.col');
-startGame();
-
-// Function for changing displayed message on screen
-function changeMessage(msg) {
-  document.getElementById("msg").innerText = msg;
+const INITIAL_STATE = {
+  gameField: [
+    [null, null, null, null, null],
+    [null, null, null, null, null],
+    [null, null, null, null, null],
+    [null, null, null, null, null],
+    [null, null, null, null, null]
+  ],
+  playerInfo: player1,
+  boardInfo: null
 }
 
-// Function for checking 3 by 3 grid for win status
-function checkWinner(grid) {
+
+startGame();
+
+
+// Function for checking 5 by 5 grid for win status
+function checkWinner(gameField) {
   // check for horizontal win
-  for (var i = 0; i < 3; i++) {
-    if (grid[i][0] !== 0 && grid[i][0] === grid[i][1] && grid[i][1] === grid[i][2]) {
-      return 1;
+  for (var i = 0; i < 5; i++) {
+    if (gameField[i][0] !== null &&
+      gameField[i][0] === gameField[i][1] &&
+      gameField[i][1] === gameField[i][2] &&
+      gameField[i][2] === gameField[i][3] &&
+      gameField[i][3] === gameField[i][4]) {
+      return true;
     }
   }
   // check for vertical win
-  for (var j = 0; j < 3; j++) {
-    if (grid[0][j] !== 0 && grid[0][j] === grid[1][j] && grid[0][j] === grid[2][j]) {
+  for (var j = 0; j < 5; j++) {
+    if (gameField[0][j] !== null &&
+      gameField[0][j] === gameField[1][j] &&
+      gameField[0][j] === gameField[2][j] &&
+      gameField[0][j] === gameField[3][j] &&
+      gameField[0][j] === gameField[4][j]
+      ) {
       return 1;
     }
   }
   // check for diagonal top-left-bottom-right
-  if (grid[0][0] !== 0 && grid[0][0] === grid[1][1] && grid[0][0] === grid[2][2]) {
+  if (gameField[0][0] !== null &&
+     gameField[0][0] === gameField[1][1] &&
+      gameField[0][0] === gameField[2][2] &&
+      gameField[0][0] === gameField[3][3] &&
+      gameField[0][0] === gameField[4][4]
+      ) {
     return 1;
   }
   // check for diagonal bottom-left-top-right
-  if (grid[2][0] !== 0 && grid[2][0] === grid[1][1] && grid[2][0] === grid[0][2]) {
-    return 1;
-  }
-  return 0;
-}
+  if (gameField[4][0] !== null &&
+     gameField[4][0] === gameField[3][1] &&
+     gameField[4][0] === gameField[2][2] &&
+     gameField[4][0] === gameField[1][3] &&
+     gameField[4][0] === gameField[0][4]
+      ) {
+        return 1;
+      }
+      return 0;
+      }
 
 // Function for checking 3 by 3 grid for a tie
-function checkTie(grid) {
-  for (var i=0; i < 3; i++) {
-    for (var j=0; j < 3; j++) {
-      if (grid[i][j] === 0)
+function checkTie(gameField) {
+  for (var i=0; i < 5; i++) {
+    for (var j=0; j < 5; j++) {
+      if (gameField[i][j] === null)
         return false;
     }
   }
@@ -63,44 +84,31 @@ function checkTie(grid) {
 }
 
 
-
-
-
-// Function for showing prompt messages on the screen
-function showPrompt(situation) {
-  document.querySelector(".prompt").style.display = "inline";
-  document.querySelector(".prompt").innerText = situation;
-}
-
 // Function for changing turns between players
 function turnSwitch() {
   // Case when player has won
-  if (checkWinner(board) === 1) {
-    winner = turn;
-    changeMessage(`Pelaaja ${winner} voitti, joten ei enää uusia siirtoja!`);
-    showPrompt(`Pelaaja ${winner} voitti`);
+  if (checkWinner(gameField) == true) {
+    boardInfo = playerInfo;
+    alert(`Player ${boardInfo} has won!`)
     // Case when the game ends in a tie
-  } else if (checkTie(board) == true) {
-    changeMessage(`Tasapeli, joten ei enää uusia siirtoja!`);
-    showPrompt(`Tasapeli!`);
+  } else if (checkTie(gameField) == true) {
+    alert("It's a tie!")
   }
   // In case neither case occurs, just inform whos turn is next
   else {
-    turn = turn === player2 ? player1: player2;
-    changeMessage(`Pelaajan ${turn} vuoro seuraavaksi`);
+    playerInfo = playerInfo === player2 ? player1: player2;
   }
 }
 // Function for resetting and initializing the game
 function startGame() {
-  // Player 1 starts the game
-  turn = player1;
-  winner = null;
-  // Reset board structure to 0
-  board = [[0,0,0], [0,0,0], [0,0,0]];
-  // Remove all prompt messages
-  document.querySelector('.prompt').style.display = "none";
+  ({playerInfo,boardInfo} = INITIAL_STATE);
+  gameField = _.cloneDeep(INITIAL_STATE.gameField);
+
+  console.log(gameField,playerInfo,boardInfo)
+//
+const cols = document.querySelectorAll('td');
   for (var i=0; i < cols.length; i++) {
-    cols[i].innerText = '';
+    cols[i].innerText = null;
     // Add click event to call function clickCol on every column
     cols[i].addEventListener('click', clickCol, false);
   }
@@ -110,15 +118,13 @@ function startGame() {
 function clickCol(col) {
   let element = document.getElementById(col.target.id);
   // Only allow columns to be clicked when there is no winner
-  if (winner == null) {
+  if (boardInfo == null) {
     if (element.innerText === "") {
 
       // Update the player on the board structure
-      board[element.dataset.r][element.dataset.c] = turn;
+      gameField[element.dataset.r][element.dataset.c] = playerInfo;
 
-      // Draw mark depending on who's turn is it
-      var draw = turn === player1 ? mark1 : mark2;
-      element.innerText = draw;
+      element.innerText = playerInfo;
       // Switch turn
       turnSwitch();
       return 1;

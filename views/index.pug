@@ -1,14 +1,17 @@
 extends layout
 block content
+
   style
     include ../public/board.css
   h1(style="text-align:center") Tic-Tac-Toe VanillaJS
   div#board
     table(cellSpacing="0" cellPadding="0" align="center")
       tbody
+      - var id = 0;
       - for (var i=0; i < 5; i++)
         tr
         - for (var j=0; j < 5; j++)
-          td x
+          - id++;
+          td(data-r=i data-c=j id=id) x
   div.flex-aligner
-    button Reset
+    button(onclick='startGame()') Reset
